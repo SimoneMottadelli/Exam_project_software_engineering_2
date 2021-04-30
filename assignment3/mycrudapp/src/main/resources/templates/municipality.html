@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:text="${'Municipality: ' + municipality.id}"></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+td, th {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<center>
+		<h1>Municipality info</h1>
+	</center>
+	<div>
+		<table style="width: 100%">
+			<tr>
+				<th>id</th>
+				<th>name</th>
+				<th>province</th>
+				<div
+					th:if="${municipality.province != null && municipality.id == municipality.province.id}">
+					<th>municipalities</th>
+				</div>
+			</tr>
+			<tr>
+				<td th:text="${municipality.id}"></td>
+				<td th:text="${municipality.name}"></td>
+				<td><div th:if="${municipality.province != null}">
+						<a th:href="@{'/municipalities/' + ${municipality.province.id}}">
+							<p th:inline="text" th:remove="tag">
+								[[${municipality.province.id}]]</p>
+						</a>
+					</div></td>
+				<div
+					th:if="${municipality.province != null && municipality.id == municipality.province.id}">
+					<td><a
+						th:href="@{'/municipalities/' + ${municipality.id} + '/municipalities/'}">
+							show municipalities in this province</a></td>
+				</div>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Update municipality</legend>
+			<form method="POST"
+				th:action="@{'/municipalities/update/' + ${municipality.id}}">
+				Name <input type="text" name="name" th:value="${municipality.name}"><br>
+				Province id <input type="number" name="provinceId"
+					th:value="${municipality.province.id}"> (leave this field
+				empty if it is a province) <br> <input type="submit" value="Submit">
+			</form>
+		</fieldset>
+	</div>
+	<a href="http://localhost:8080/municipalities/">Show municipalities</a>
+	<br>
+	<a href="http://localhost:8080">Home</a>
+</body>
+</html>

@@ -1,0 +1,124 @@
+# maven:3.6-jdk-8-slim image has been used in order to execute Maven goals
+image: maven:3.6-jdk-8-slim
+
+# the variables INTEGRATION_TESTS and UNIT_TESTS have been used to
+# execute integration tests and unit tests separately.
+variables:
+    MAVEN_CLI_OPS: "--batch-mode"
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+    MYSQL_DATABASE: "prova"
+    MYSQL_ROOT_PASSWORD: "root"
+    INTEGRATION_TESTS: "-P IntegrationTest"
+    UNIT_TESTS: "-P UnitTest"
+    
+stages:
+    - build
+    - verify
+    - unit-test
+    - integration-test
+    - package
+    - release
+    - deploy
+    
+compile:
+    cache:
+        key: "$CI_COMMIT_REF_SLUG"
+        paths:
+          - .m2/repository/
+    stage: build
+    script:
+        - mvn $MAVEN_OPTS compile
+        
+static-analysis-checkstyle:
+    stage: verify
+    cache:
+        key: "$CI_COMMIT_REF_SLUG"
+        paths:
+          - .m2/repository/
+    script: 
+        - mvn $MAVEN_OPTS checkstyle:check
+    artifacts:
+        when: on_failure # artifact created only if the job fails
+        paths:
+            - target/checkstyle-result.xml # artifact that contains the violations found
+    allow_failure: true # the pipeline does not stop if the job fails
+    
+static-analysis-pmd:
+    stage: verify
+    cache:
+        key: "$CI_COMMIT_REF_SLUG"
+        paths:
+          - .m2/repository/
+    script:
+        - mvn $MAVEN_OPTS pmd:pmd
+    artifacts:
+        paths:
+            - target/pmd.xml
+        
+unit-tests:
+    stage: unit-test
+    cache:
+        key: "$CI_COMMIT_REF_SLUG"
+        paths:
+            - .m2/repository/
+            - target/
+    script:
+        - mvn $MAVEN_OPTS test $UNIT_TESTS
+    dependencies: []
+     
+integration-tests:
+    stage: integration-test
+    cache:
+        key: "$CI_COMMIT_REF_SLUG"
+        paths:
+            - .m2/repository/
+    services: 
+        - mysql
+    script:
+        - mvn $MAVEN_OPTS verify $INTEGRATION_TESTS
+    dependencies: []
+
+package:
+    stage: package
+    cache:
+        key: "$CI_COMMIT_REF_SLUG"
+        paths:
+            - .m2/repository/
+        policy: pull # not push, only pull
+    script:
+        - mvn $MAVEN_OPTS package -DskipTests
+    only:
+        - master # it is executed only on the master branch
+    artifacts:
+        paths:
+         - target/*.jar # the generated jar file is stored in target/*.jar
+    dependencies: []
+    
+release:
+    stage: release
+    only:
+        - master # it is executed only on the master branch
+    image: docker:latest # to execute Docker commands
+    services: 
+        - docker:dind # docker-in-docker
+    script:
+        - docker build -t registry.gitlab.com/claudiom4sir/2019_assignment1_myapp . # creates the docker image with the app
+        - docker login -u $USERNAME -p $GITLAB_TOKEN registry.gitlab.com # login to the Gitlab registry
+        - docker push registry.gitlab.com/claudiom4sir/2019_assignment1_myapp # push docker image to the Gitlab registry
+    dependencies:
+        - package # it downloads only the arficact generated during the package job, which is the jar file
+    
+deploy:
+    stage: deploy
+    only:
+        - master # it is executed only on the master branch
+    image: debian:stable-slim # to execute shell commands
+    before_script: # establish an SSH connection with the target virtual machine
+        - 'which ssh-agent || ( apt-get update -qq && apt-get install -qq openssh-client )'
+        - eval $(ssh-agent -s)
+        - ssh-add <(echo "$SSH_PRIVATE_KEY")
+        - mkdir -p ~/.ssh
+        - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    script: # it starts a container in the target virtual machine and it runs the image pushed during the release stage
+        - ssh $SSH_VM_ADDRESS "docker login -u $USERNAME -p $GITLAB_TOKEN registry.gitlab.com && docker rm --force myapp && docker pull registry.gitlab.com/claudiom4sir/2019_assignment1_myapp && docker run -p 8080:8080 --name myapp --link mysql:mysql -d registry.gitlab.com/claudiom4sir/2019_assignment1_myapp:latest && exit"
+    dependencies: []

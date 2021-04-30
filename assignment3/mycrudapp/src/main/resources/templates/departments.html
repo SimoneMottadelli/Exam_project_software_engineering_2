@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Departments</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+td, th {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<center>
+		<h1>Departments</h1>
+	</center>
+	<div>
+		<table style="width: 100%">
+			<tr>
+				<th>id</th>
+				<th>name</th>
+				<th>telepthone</th>
+				<th></th>
+			</tr>
+			<th:block th:each="department : ${departments}">
+				<tr>
+					<td><a th:href="@{/departments/{id}(id = ${department.id})}">
+							<p th:inline="text" th:remove="tag">[[${department.id}]]</p>
+					</a></td>
+					<td th:text="${department.name}"></td>
+					<td th:text="${department.telephone}"></td>
+					<td>
+						<form method="POST"
+							th:action="@{'/departments/delete/' + ${department.id}}">
+							<input type="submit" value="Delete">
+						</form>
+					</td>
+				</tr>
+			</th:block>
+		</table>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Insert a new course</legend>
+			<form method="POST" action="/departments/add/">
+				Name <input type="text" name="name"><br> Telephone <input
+					type="number" name="telephone"><br>
+				<input type="submit" value="Submit">
+			</form>
+		</fieldset>
+	</div>
+	<a href="http://localhost:8080">Home</a>
+</body>
+</html>

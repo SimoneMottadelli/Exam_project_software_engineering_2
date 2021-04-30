@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:text="${'Course: ' + course.id}"></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+td, th {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<center>
+		<h1>Course info</h1>
+	</center>
+	<div>
+		<table style="width: 100%">
+			<tr>
+				<th>course_id</th>
+				<th>name</th>
+				<th>exams</th>
+			</tr>
+			<tr>
+				<td th:text="${course.id}"></td>
+				<td th:text="${course.name}"></td>
+				<td><a th:href="@{'/exams/course/' + ${course.id}}"> show
+						exams of this course </a></td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Update course</legend>
+			<form method="POST" th:action="@{'/courses/update/' + ${course.id}}">
+				Name <input type="text" name="name" th:value="${course.name}"><br>
+				<input type="submit" value="Submit">
+			</form>
+		</fieldset>
+	</div>
+	<a href="http://localhost:8080/courses/">Show courses</a>
+	<br>
+	<a href="http://localhost:8080">Home</a>
+</body>
+</html>

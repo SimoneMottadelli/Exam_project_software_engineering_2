@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Exams</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+td, th {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<center>
+		<h1>Exams</h1>
+	</center>
+	<div>
+		<table style="width: 100%">
+			<tr>
+				<th>student_id</th>
+				<th>course_id</th>
+				<th>details</th>
+				<th></th>
+			</tr>
+			<th:block th:each="exam : ${exams}">
+				<tr>
+					<td><a th:href="@{'/people/' + ${exam.student.id}}">
+							<p th:inline="text" th:remove="tag">[[${exam.student.id}]]</p>
+					</a></td>
+
+					<td><a th:href="@{'/courses/' + ${exam.course.id}}">
+							<p th:inline="text" th:remove="tag">[[${exam.course.id}]]</p>
+					</a></td>
+					<td><a
+						th:href="@{'/exams/student/' + ${exam.student.id} + '/course/' + ${exam.course.id}}">
+							<p th:inline="text" th:remove="tag">show info of this exam</p>
+					</a></td>
+					<td>
+						<form method="POST"
+							th:action="@{'/exams/delete/student/' + ${exam.student.id} + '/course/' + ${exam.course.id}}">
+							<input type="submit" value="Delete">
+						</form>
+					</td>
+				</tr>
+			</th:block>
+		</table>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Insert a new exam</legend>
+			<form method="POST" action="/exams/add/">
+				Student_id <input type="number" name="studentId"><br>
+				Course_id <input type="number" name="courseId"><br>
+				Evaluation <input type="number" name="evaluation"><br>
+				<input type="submit"
+					value="Submit">
+			</form>
+		</fieldset>
+	</div>
+	<a href="http://localhost:8080">Home</a>
+</body>
+</html>

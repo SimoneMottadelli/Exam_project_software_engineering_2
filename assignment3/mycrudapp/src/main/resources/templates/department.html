@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:text="${'Department: ' + department.id}"></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+td, th {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<center>
+		<h1>Department info</h1>
+	</center>
+	<div>
+		<table style="width: 100%">
+			<tr>
+				<th>course_id</th>
+				<th>name</th>
+				<th>telephone</th>
+				<th>professors</th>
+			</tr>
+			<tr>
+				<td th:text="${department.id}"></td>
+				<td th:text="${department.name}"></td>
+				<td th:text="${department.telephone}"></td>
+				<td><a th:href="@{'/departments/' + ${department.id} + '/professors/'}">show
+						professors in this department</a></td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Update department</legend>
+			<form method="POST"
+				th:action="@{'/departments/update/' + ${department.id}}">
+				Name <input type="text" name="name" th:value="${department.name}"><br>
+				Telephone <input type="number" name="telephone"
+					th:value="${department.telephone}"><br> <input
+					type="submit" value="Submit">
+			</form>
+		</fieldset>
+	</div>
+	<a href="http://localhost:8080/departments/">Show departments</a><br>
+	<a href="http://localhost:8080">Home</a>
+</body>
+</html>

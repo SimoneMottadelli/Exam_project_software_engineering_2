@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>People</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+td, th {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<center><h1>Students</h1></center>
+	<div>
+		<table style="width: 100%">
+			<tr>
+				<th>id</th>
+				<th>name</th>
+				<th>surname</th>
+				<th>birth_municipality</th>
+				<th></th>
+			</tr>
+			<th:block th:each="person : ${people}">
+				<tr>
+					<td>
+						<a th:href="@{/people/{id}(id = ${person.id})}">
+							<p th:inline="text" th:remove="tag">
+								[[${person.id}]]
+							</p>
+						</a>
+					</td>		
+					<td th:text="${person.name}"></td>
+					<td th:text="${person.surname}"></td>
+					<td><a
+						th:href="@{/municipalities/{id}(id = ${person.birthMunicipality.id})}">
+							<p th:inline="text" th:remove="tag">[[${person.birthMunicipality.id}]]</p>
+					</a></td>
+					<td>
+						<form method="POST"
+							th:action="@{'/people/delete/' + ${person.id}}">
+							<input name="sourcePage" value="students" hidden>
+							<input type="submit" value="Delete">
+						</form>
+					</td>
+				</tr>
+			</th:block>
+		</table>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Insert a new student</legend>
+			<form method="POST" action="/people/add/">
+				Name <input type="text" name="name"> <br>
+				Surname <input type="text" name="surname"> <br>
+				Birth municipality <input type="number" name="birthMunicipalityId"> <br>
+				Isee <input type="number" name="isee"> <br>
+				<input type="text" name="type" value="student" hidden> <br>
+				<input type="submit" value="Submit">
+			</form>
+		</fieldset>
+	</div>
+	<a href="http://localhost:8080/people/professors/">Show only professors</a><br>
+	<a href="http://localhost:8080/people/">Show all people</a><br>
+	<a href="http://localhost:8080">Home</a>
+</body>
+</html>

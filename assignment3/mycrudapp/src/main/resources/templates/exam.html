@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:text="${'Exam: ' + exam.student.id + ' ' + exam.course.id}"></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+td, th {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<center>
+		<h1>Exam info</h1>
+	</center>
+	<div>
+		<table style="width: 100%">
+			<tr>
+				<th>student</th>
+				<th>course</th>
+				<th>evaluation</th>
+			</tr>
+			<tr>
+				<td><a th:href="@{'/people/' + ${exam.student.id}}">
+						<p th:inline="text" th:remove="tag">[[${exam.student.id}]]</p>
+				</a></td>
+
+				<td><a th:href="@{'/courses/' + ${exam.course.id}}">
+						<p th:inline="text" th:remove="tag">[[${exam.course.id}]]</p>
+				</a></td>
+				<td th:text="${exam.evaluation}"></td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Update exam</legend>
+			<form method="POST"
+				th:action="@{'/exams/update/student/' + ${exam.student.id} + '/course/' + ${exam.course.id}}">
+				Evaluation <input type="number" name="evaluation"
+					th:value="${exam.evaluation}"><br>
+				<input type="submit" value="Submit">
+			</form>
+		</fieldset>
+	</div>
+	<a href="http://localhost:8080/exams/">Show exams</a>
+	<br>
+	<a href="http://localhost:8080">Home</a>
+</body>
+</html>

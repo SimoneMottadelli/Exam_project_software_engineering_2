@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<script type="text/javascript"
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		
+		var ip = location.host;
+		
+		updateList(ip);
+		
+		$("#sendDataBtn").click(function() {
+			name = $("#nameInput").val();
+			email = $("#emailInput").val();
+			$.ajax({
+			    type: 'POST',
+			    url: 'http://' + ip + '/demo/add',
+			    data: '{"name":"' + name + '", "email":"' + email + '"}',
+			    success: function(data) { console.log("ciao") },
+			    contentType: "application/json",
+			    dataType: 'json'
+			});
+			clearFields();
+			alert("Request sent!");
+		});
+		
+		$("#updateButton").click(function() {
+			updateList(ip);
+		});
+		
+	});
+	
+	function updateList(ip) {
+		$.get("http://" + ip + "/demo/all", function(data, status){
+			result = ""
+		    for(i = 0; i < data.length; i++) {
+		    	result += "Name: " + data[i]["name"] + ", Email: " + data[i]["email"] + "<br>";
+		    }
+			$("#resultDiv").html(result);
+		  });
+	}
+		
+	function clearFields() {
+		$("#nameInput").val("");
+		$("#emailInput").val("");
+	}
+	
+</script>
+<body>
+<form>
+<fieldset>
+<legend>Registration:</legend>
+Insert your name<br>
+<input type="text" id="nameInput"><br>
+Insert your email<br>
+<input type="text" id="emailInput"><br>
+<input type="button" id="sendDataBtn" value="Submit">
+</fieldset>
+<fieldset>
+<legend>Records from database:</legend>
+<input type="button" id="updateButton" value="Update list">
+<div id="resultDiv"></div>
+</fieldset>
+</form>
+</body>
+</html>

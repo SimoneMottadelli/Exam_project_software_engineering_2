@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Municipalities</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+td, th {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<center>
+		<h1>Municipalities</h1>
+		<div th:inline="text" th:if="${name != null}"><h2>Results for "[[${name}]]"</h2></div>
+	</center>
+	<div>
+		<table style="width: 100%">
+			<tr>
+				<th>id</th>
+				<th>name</th>
+				<th>province</th>
+				<th></th>
+			</tr>
+			<th:block th:each="municipality : ${municipalities}">
+				<tr>
+					<td><a
+						th:href="@{/municipalities/{id}(id = ${municipality.id})}">
+							<p th:inline="text" th:remove="tag">[[${municipality.id}]]</p>
+					</a></td>
+					<td th:text="${municipality.name}"></td>
+					<td><div th:if="${municipality.province != null}">
+							<a
+								th:href="@{/municipalities/{id}(id = ${municipality.province.id})}">
+								<p th:inline="text" th:remove="tag">
+									[[${municipality.province.id}]]</p>
+							</a>
+						</div></td>
+					<td>
+						<form method="POST"
+							th:action="@{'/municipalities/delete/' + ${municipality.id}}">
+							<input type="submit" value="Delete">
+						</form>
+					</td>
+				</tr>
+			</th:block>
+		</table>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Insert a new municipality</legend>
+			<form method="POST" action="/municipalities/add/">
+				Name <input type="text" name="name"> <br> Province id <input
+					type="number" name="provinceId">  (leave this field empty if it is a province) <br> <input type="submit"
+					value="Submit">
+			</form>
+		</fieldset>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Find by name</legend>
+			<form method="GET" th:action="@{'/municipalities/find'}">
+				Name <input type="text" name="name"><br>
+				<input type="submit" value="Find">
+			</form>
+		</fieldset>
+	</div>
+	<a href="http://localhost:8080">Home</a>
+</body>
+</html>
